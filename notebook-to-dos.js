@@ -13,11 +13,15 @@ define(['base/js/namespace','jquery'], function(Jupyter, $) {
     function place_to_dos_cell() {
         var to_dos_cell = Jupyter.notebook.insert_cell_at_index('markdown', 0);
         var cell_text = '# To Dos\n';
+        cell_text += '<input type="text" class="to-dos-new-task"></input>';
         cell_text += '<button class="to-dos-add-task">Add Task</button>';
         cell_text += '<br><br>';
+        cell_text += '<div class="existing-to-dos"></div>';
         to_dos_cell.set_text(cell_text);
         to_dos_cell.render();
         to_dos_cell.metadata.id = 'to_dos_cell';
+        to_dos_cell.metadata.tasks = [];
+        load_to_dos_cell_events();
         return to_dos_cell;
     }
 
@@ -28,33 +32,44 @@ define(['base/js/namespace','jquery'], function(Jupyter, $) {
         } else {
             var to_dos_cell = place_to_dos_cell();
         }
+        render_tasks(to_dos_cell);
         return to_dos_cell;
+    }
+
+    function render_tasks(to_dos_cell) {
+        var tasks = to_dos_cell.metadata.tasks;
+        var num_tasks = tasks.length;
+        for (var i = 0; i < num_tasks; i++) {
+            render_task(to_dos_cell, tasks[i]);
+        }
+    }
+
+    function render_task(to_dos_cell, task) {
+        if (task.status == 'open') {
+            var to_dos_list = to_dos_cell.element.find('div.existing-to-dos');
+            var task_content = '<input type="checkbox" class="to-dos-complete"/>';
+            task_content += '<span>' + task.task + '</span><br>';
+            to_dos_list.append(task_content);
+        }
     }
 
     function load_to_dos_cell_events() {
         var to_dos_cell = get_to_dos_cell();
-        console.log(to_dos_cell.element);
-        console.log(to_dos_cell.element.find("button.to-dos-add-task"));
         
-        to_dos_cell.element.find("button.to-dos-add-task").bind('click', function() {
-            var current_content = to_dos_cell.get_text();
-            current_content += "<input type='text' class='to-do-item'></input>";
-            current_content += "<button class='to-do-item-add'>Add</button>";
-            to_dos_cell.set_text(current_content);
-            to_dos_cell.render();
-        });
-
-        to_dos_cell.element.find("input.to-do-item").bind('focusin', function() {
+        to_dos_cell.element.find("input.to-dos-new-task").bind('focusin', function() {
             Jupyter.notebook.keyboard_manager.disable();
         });
-        to_dos_cell.element.find("input.to-do-item").bind('focusout', function() {
+        to_dos_cell.element.find("input.to-dos-new-task").bind('focusout', function() {
             Jupyter.notebook.keyboard_manager.enable();
         });
 
-        to_dos_cell.element.find("button.to-do-item-add").bind('click', function() {
-            var task_text = $(this).prev().val();
-            $(this).prev().replaceWith('<p>' + task_text + '</p>');
-            $(this).replaceWith('<button class="to-do-item-complete">Complete</a>');
+        to_dos_cell.element.find("button.to-dos-add-task").bind('click', function() {
+            var task = {
+                'task': $(this).prev().val(),
+                'status': 'open'
+            };
+            to_dos_cell.metadata.tasks.push(task);
+            render_task(to_dos_cell, task);
         });
     }
 
@@ -68,7 +83,7 @@ define(['base/js/namespace','jquery'], function(Jupyter, $) {
                 {
                     'label': 'Add To-do List Cell',
                     'icon': 'fa-list',
-                    'callback': load_to_dos_cell_events,
+                    'callback': place_to_dos_cell,
                     'id': 'create-to-dos-button',
                 }
             ]);
