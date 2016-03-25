@@ -12,7 +12,9 @@ define(['base/js/namespace','jquery'], function(Jupyter, $) {
 
     function place_to_dos_cell() {
         var to_dos_cell = Jupyter.notebook.insert_cell_at_index('markdown', 0);
-        to_dos_cell.set_text('# To Dos\n');
+        var cell_text = '# To Dos\n';
+        cell_text += '<button class="to-dos-add-task">Add Task</button><br><br>';
+        to_dos_cell.set_text(cell_text);
         to_dos_cell.render();
         to_dos_cell.metadata.id = 'to_dos_cell';
         return to_dos_cell;
@@ -31,7 +33,7 @@ define(['base/js/namespace','jquery'], function(Jupyter, $) {
     function load_to_dos_cell_events() {
         var to_dos_cell = get_to_dos_cell();
         to_dos_cell.element.click(function(event) {
-            if (!$(event.target).is("input")) {
+            if ($(event.target).is("button.to-dos-add-task")) {
                 var current_content = to_dos_cell.get_text();
                 current_content += "<input type='checkbox' class='to-do-item-check'></input>";
                 current_content += "<input type='text' class='to-do-item'></input><br>";
