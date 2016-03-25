@@ -30,10 +30,9 @@ define(['base/js/namespace','jquery'], function(Jupyter, $) {
 
     function load_to_dos_cell_events() {
         var to_dos_cell = get_to_dos_cell();
-        console.log('to_dos_cell');
-        console.log(to_dos_cell);
         to_dos_cell.element.click(function(event) {
             if (!$(event.target).is("input")) {
+                var current_content = to_dos_cell.get_text();
                 current_content += "<input type='checkbox' class='to-do-item-check'></input>";
                 current_content += "<input type='text' class='to-do-item'></input><br>";
                 to_dos_cell.set_text(current_content);
