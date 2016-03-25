@@ -13,7 +13,9 @@ define(['base/js/namespace','jquery'], function(Jupyter, $) {
     function place_to_dos_cell() {
         var to_dos_cell = Jupyter.notebook.insert_cell_at_index('markdown', 0);
         var cell_text = '# To Dos\n';
-        cell_text += '<button class="to-dos-add-task">Add Task</button><br><br>';
+        cell_text += '<button class="to-dos-add-task">Add Task</button>';
+        cell_text += '<button class="to-dos-complete-task">Complete Task</button>';
+        cell_text += '<br><br>';
         to_dos_cell.set_text(cell_text);
         to_dos_cell.render();
         to_dos_cell.metadata.id = 'to_dos_cell';
@@ -32,14 +34,22 @@ define(['base/js/namespace','jquery'], function(Jupyter, $) {
 
     function load_to_dos_cell_events() {
         var to_dos_cell = get_to_dos_cell();
-        to_dos_cell.element.click(function(event) {
-            if ($(event.target).is("button.to-dos-add-task")) {
-                var current_content = to_dos_cell.get_text();
-                current_content += "<input type='checkbox' class='to-do-item-check'></input>";
-                current_content += "<input type='text' class='to-do-item'></input><br>";
-                to_dos_cell.set_text(current_content);
-                to_dos_cell.render();
-            }
+        console.log(to_dos_cell.element);
+        console.log(to_dos_cell.element.find("button.to-dos-add-task"));
+        
+        to_dos_cell.element.find("button.to-dos-add-task").bind('click', function() {
+            var current_content = to_dos_cell.get_text();
+            current_content += "<input type='checkbox' class='to-do-item-check'></input>";
+            current_content += "<input type='text' class='to-do-item'></input><br>";
+            to_dos_cell.set_text(current_content);
+            to_dos_cell.render();
+        });
+
+        to_dos_cell.element.find("input.to-do-item").bind('focusin', function() {
+            Jupyter.notebook.keyboard_manager.disable();
+        });
+        to_dos_cell.element.find("input.to-do-item").bind('focusout', function() {
+            Jupyter.notebook.keyboard_manager.enable();
         });
     }
 
@@ -58,6 +68,8 @@ define(['base/js/namespace','jquery'], function(Jupyter, $) {
                 }
             ]);
         }
+
+        load_to_dos_cell_events();
     }
 
     function load_ipython_extension() {
