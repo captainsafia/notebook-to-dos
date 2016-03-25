@@ -21,7 +21,7 @@ define(['base/js/namespace','jquery'], function(Jupyter, $) {
     function get_to_dos_cell() {
         var existing_cell = does_to_dos_cell_exist();
         if (existing_cell) {
-            var to_dos_cell = exists_cell;
+            var to_dos_cell = existing_cell;
         } else {
             var to_dos_cell = place_to_dos_cell();
         }
@@ -30,6 +30,8 @@ define(['base/js/namespace','jquery'], function(Jupyter, $) {
 
     function load_to_dos_cell_events() {
         var to_dos_cell = get_to_dos_cell();
+        console.log('to_dos_cell');
+        console.log(to_dos_cell);
         to_dos_cell.element.click(function(event) {
             if (!$(event.target).is("input")) {
                 current_content += "<input type='checkbox' class='to-do-item-check'></input>";
