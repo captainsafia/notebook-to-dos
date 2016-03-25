@@ -14,7 +14,6 @@ define(['base/js/namespace','jquery'], function(Jupyter, $) {
         var to_dos_cell = Jupyter.notebook.insert_cell_at_index('markdown', 0);
         var cell_text = '# To Dos\n';
         cell_text += '<button class="to-dos-add-task">Add Task</button>';
-        cell_text += '<button class="to-dos-complete-task">Complete Task</button>';
         cell_text += '<br><br>';
         to_dos_cell.set_text(cell_text);
         to_dos_cell.render();
@@ -39,8 +38,8 @@ define(['base/js/namespace','jquery'], function(Jupyter, $) {
         
         to_dos_cell.element.find("button.to-dos-add-task").bind('click', function() {
             var current_content = to_dos_cell.get_text();
-            current_content += "<input type='checkbox' class='to-do-item-check'></input>";
-            current_content += "<input type='text' class='to-do-item'></input><br>";
+            current_content += "<input type='text' class='to-do-item'></input>";
+            current_content += "<button class='to-do-item-add'>Add</button>";
             to_dos_cell.set_text(current_content);
             to_dos_cell.render();
         });
@@ -50,6 +49,12 @@ define(['base/js/namespace','jquery'], function(Jupyter, $) {
         });
         to_dos_cell.element.find("input.to-do-item").bind('focusout', function() {
             Jupyter.notebook.keyboard_manager.enable();
+        });
+
+        to_dos_cell.element.find("button.to-do-item-add").bind('click', function() {
+            var task_text = $(this).prev().val();
+            $(this).prev().replaceWith('<p>' + task_text + '</p>');
+            $(this).replaceWith('<button class="to-do-item-complete">Complete</a>');
         });
     }
 
