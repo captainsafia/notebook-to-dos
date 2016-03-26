@@ -40,14 +40,14 @@ define(['base/js/namespace','jquery'], function(Jupyter, $) {
         var tasks = to_dos_cell.metadata.tasks;
         var num_tasks = tasks.length;
         for (var i = 0; i < num_tasks; i++) {
-            render_task(to_dos_cell, tasks[i]);
+            render_task(to_dos_cell, tasks[i], i);
         }
     }
 
-    function render_task(to_dos_cell, task) {
+    function render_task(to_dos_cell, task, id) {
         if (task.status == 'open') {
             var to_dos_list = to_dos_cell.element.find('div.existing-to-dos');
-            var task_content = '<input type="checkbox" class="to-dos-complete"/>';
+            var task_content = '<input type="checkbox" class="to-dos-complete" id="' + id +'"/>';
             task_content += '<span>' + task.task + '</span><br>';
             to_dos_list.append(task_content);
         }
@@ -55,13 +55,9 @@ define(['base/js/namespace','jquery'], function(Jupyter, $) {
 
     function load_to_dos_cell_events() {
         var to_dos_cell = get_to_dos_cell();
-        
-        to_dos_cell.element.find("input.to-dos-new-task").bind('focusin', function() {
-            Jupyter.notebook.keyboard_manager.disable();
-        });
-        to_dos_cell.element.find("input.to-dos-new-task").bind('focusout', function() {
-            Jupyter.notebook.keyboard_manager.enable();
-        });
+
+        var task_input = $(to_dos_cell.element.find('input.to-dos-new-task'));
+        Jupyter.keyboard_manager.register_events(task_input);
 
         to_dos_cell.element.find("button.to-dos-add-task").bind('click', function() {
             var task = {
@@ -71,6 +67,7 @@ define(['base/js/namespace','jquery'], function(Jupyter, $) {
             to_dos_cell.metadata.tasks.push(task);
             render_task(to_dos_cell, task);
         });
+
     }
 
     function place_to_dos_button() {
