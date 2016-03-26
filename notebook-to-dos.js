@@ -68,6 +68,12 @@ define(['base/js/namespace','jquery'], function(Jupyter, $) {
             render_task(to_dos_cell, task);
         });
 
+        to_dos_cell.element.find("input.to-dos-complete").bind('change', function() {
+            if (this.checked) {
+                var id = $(this).attr('id');
+                to_dos_cell.metadata.tasks[id].status = 'complete';
+            }
+        });
     }
 
     function place_to_dos_button() {
