@@ -72,6 +72,12 @@ define(['base/js/namespace','jquery'], function(Jupyter, $) {
             if (this.checked) {
                 var id = $(this).attr('id');
                 to_dos_cell.metadata.tasks[id].status = 'complete';
+                // Remove the <br> after the <span>
+                $(this).next().next().remove();
+                // Remove the <span>
+                $(this).next().remove();
+                // Remove the <input>
+                $(this).remove();
             }
         });
     }
