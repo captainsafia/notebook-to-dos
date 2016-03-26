@@ -101,8 +101,17 @@ define(['base/js/namespace','jquery'], function(Jupyter, $) {
         load_to_dos_cell_events();
     }
 
+    function load_css() {
+        var link = document.createElement("link");
+        link.type = "text/css";
+        link.rel = "stylesheet";
+        link.href = './notebook-to-dos.css';
+        $("head").append(link);
+    }
+
     function load_ipython_extension() {
         console.log('Loading notebook-to-dos extension');
+        load_css();
         place_to_dos_button();
     }
 
