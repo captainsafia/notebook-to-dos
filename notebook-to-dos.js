@@ -13,9 +13,13 @@ define(['base/js/namespace','jquery'], function(Jupyter, $) {
     function place_to_dos_cell() {
         var to_dos_cell = Jupyter.notebook.insert_cell_at_index('markdown', 0);
         var cell_text = '# To Dos\n';
-        cell_text += '<input type="text" class="to-dos-new-task"></input>';
-        cell_text += '<button class="to-dos-add-task">Add Task</button>';
-        cell_text += '<br><br>';
+        cell_text += '<br>';
+        cell_text += '<div class="input-group">';
+        cell_text += '<input type="text" class="to-dos-new-task form-control"></input>';
+        cell_text += '<span class="input-group-btn">';
+        cell_text += '<button class="to-dos-add-task btn btn-primary">Add Task</button>';
+        cell_text += '</span>';
+        cell_text += '</div>';
         cell_text += '<div class="existing-to-dos"></div>';
         to_dos_cell.set_text(cell_text);
         to_dos_cell.render();
@@ -47,13 +51,20 @@ define(['base/js/namespace','jquery'], function(Jupyter, $) {
     function render_task(to_dos_cell, task, id) {
         if (task.status == 'open') {
             var to_dos_list = to_dos_cell.element.find('div.existing-to-dos');
-            var task_content = '<input type="checkbox" class="to-dos-complete" id="' + id +'"/>';
-            task_content += '<span>' + task.task + '</span><br>';
+            var task_content = '<div class="input-group">';
+            task_content += '<span class="input-group-addon">';
+            task_content += '<input type="checkbox" class="to-dos-complete" id="' + id +'"/>';
+            task_content += '</span>';
+            task_content += '<input type="text" readonly="readonly"';
+            task_content += 'class="form-control"';
+            task_content += 'placeholder="' + task.task + '">';
+            task_content += '</div>';
             to_dos_list.append(task_content);
         }
     }
 
     function load_to_dos_cell_events() {
+        console.log('Loading notebook-to-dos events...');
         var to_dos_cell = get_to_dos_cell();
 
         var task_input = $(to_dos_cell.element.find('input.to-dos-new-task'));
@@ -61,23 +72,18 @@ define(['base/js/namespace','jquery'], function(Jupyter, $) {
 
         to_dos_cell.element.find("button.to-dos-add-task").bind('click', function() {
             var task = {
-                'task': $(this).prev().val(),
+                'task': $(this).parent().prev().val(),
                 'status': 'open'
             };
             to_dos_cell.metadata.tasks.push(task);
-            render_task(to_dos_cell, task);
+            render_task(to_dos_cell, task, to_dos_cell.metadata.tasks.length);
         });
 
-        to_dos_cell.element.find("input.to-dos-complete").bind('change', function() {
+        to_dos_cell.element.on('click', 'input.to-dos-complete', function() {
             if (this.checked) {
-                var id = $(this).attr('id');
+                var id = parseInt($(this).attr('id')) - 1;
                 to_dos_cell.metadata.tasks[id].status = 'complete';
-                // Remove the <br> after the <span>
-                $(this).next().next().remove();
-                // Remove the <span>
-                $(this).next().remove();
-                // Remove the <input>
-                $(this).remove();
+                $(this).closest('.input-group').remove();
             }
         });
     }
